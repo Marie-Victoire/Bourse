@@ -1,0 +1,33 @@
+name: Garder la base éveillée
+
+on:
+  schedule:
+    - cron: "17 6 */3 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  reveil:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Interroger la base
+        run: |
+          URL=$(grep -o 'supabaseUrl: *"[^"]*"' config.js | sed 's/.*"\(.*\)"/\1/')
+          KEY=$(grep -o 'supabaseAnonKey: *"[^"]*"' config.js | sed 's/.*"\(.*\)"/\1/')
+          curl -fsS "$URL/rest/v1/annonces?select=id&limit=1" -H "apikey: $KEY"
+          echo "Base éveillée."
+
+      - name: Garder le dépôt actif (une fois par mois)
+        run: |
+          if [ "$(date +%d)" -le 3 ]; then
+            date -u +"%Y-%m-%d %H:%M UTC" > derniere-verification.txt
+            git config user.name "reveil-bourse"
+            git config user.email "reveil-bourse@users.noreply.github.com"
+            git add derniere-verification.txt
+            git commit -m "Vérification mensuelle" || true
+            git push || true
+          fi
