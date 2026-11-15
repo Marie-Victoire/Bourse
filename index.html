@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Bourse des Ateliers</title>
+<meta name="description" content="Petites annonces gratuites entre fabricants de lunettes : machines, outillage, matière première et pièces détachées à vendre, à donner ou recherchées.">
+<meta property="og:title" content="La Bourse des Ateliers">
+<meta property="og:description" content="Machines, outillage et matière entre fabricants de lunettes. Gratuit, sans inscription.">
+<meta name="theme-color" content="#f4efe6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%A0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4efe6; --paper:#fffdf9; --ink:#1f1c18; --mute:#6f675c; --line:#e3dacb;
+  --vente:#1f5c4a; --vente-bg:#e2efe9;
+  --recherche:#a8531a; --recherche-bg:#f7e7d9;
+  --don:#6b4a8a; --don-bg:#eee5f4;
+  --pret:#2c5a85; --pret-bg:#e1ebf4;
+  --danger:#a3312a; --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;font-weight:700;letter-spacing:-.01em}
+.wrap{max-width:1120px;margin:0 auto;padding:0 18px}
+header{padding:28px 0 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#efe7d9,var(--bg))}
+.top{display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.brand small{display:block;text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--mute);font-weight:600;margin-bottom:6px}
+.brand h1{font-size:clamp(28px,5vw,42px);line-height:1.05}
+.brand p{margin:8px 0 0;color:var(--mute);max-width:520px}
+.btn{border:0;border-radius:999px;padding:11px 18px;font-weight:600;cursor:pointer;background:var(--ink);color:#fff;display:inline-flex;gap:8px;align-items:center;white-space:nowrap}
+.btn:hover{opacity:.9}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--paper)}
+.btn.small{padding:7px 13px;font-size:13px}
+.btn.danger{background:var(--danger)}
+.btn:disabled{opacity:.5;cursor:default}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--mute)}
+.stat b{color:var(--ink)}
+.banner{margin:16px 0 0;padding:12px 14px;border-radius:12px;background:#fff6dc;border:1px solid #efdca3;font-size:14px;display:none}
+.banner.show{display:block}
+
+.controls{position:sticky;top:0;z-index:5;background:rgba(244,239,230,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.tab{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:500;font-size:14px;white-space:nowrap}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filters{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;margin-top:10px}
+.filters input,.filters select{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:9px 12px;min-width:0}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mute);white-space:nowrap;padding:0 4px;cursor:pointer}
+@media (max-width:720px){.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}}
+
+main{padding:20px 0 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .12s, box-shadow .12s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(60,40,10,.08)}
+.thumb{aspect-ratio:4/3;background:#ebe3d5 center/cover no-repeat;position:relative;display:flex;align-items:center;justify-content:center;color:#b3a896}
+.thumb svg{width:44px;height:44px}
+.badge{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;display:inline-block}
+.thumb .badge{position:absolute;top:10px;left:10px}
+.b-vente{background:var(--vente-bg);color:var(--vente)}
+.b-recherche{background:var(--recherche-bg);color:var(--recherche)}
+.b-don{background:var(--don-bg);color:var(--don)}
+.b-pret{background:var(--pret-bg);color:var(--pret)}
+.thumb .statut{left:auto;position:absolute;top:10px;right:10px;background:rgba(31,28,24,.82);color:#fff}
+.card.closed .thumb{filter:grayscale(.8) opacity(.7)}
+.cbody{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.cbody h3{font-size:17px;line-height:1.25}
+.price{font-weight:600;font-size:16px}
+.meta{color:var(--mute);font-size:13px;display:flex;gap:6px;flex-wrap:wrap}
+.meta span+span::before{content:"·";margin-right:6px}
+.old{font-size:12px;color:var(--recherche)}
+.empty{text-align:center;padding:60px 20px;color:var(--mute)}
+.empty h2{color:var(--ink);font-size:22px;margin-bottom:8px}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(25,20,14,.55);display:none;align-items:flex-start;justify-content:center;z-index:20;overflow-y:auto;padding:24px 12px}
+.overlay.show{display:flex}
+.modal{background:var(--paper);border-radius:18px;width:100%;max-width:720px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.mhead{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}
+.mhead h2{font-size:22px}
+.x{background:none;border:0;font-size:26px;line-height:1;cursor:pointer;color:var(--mute);padding:4px 8px}
+.mbody{padding:18px 20px 22px}
+.gallery{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.gmain{width:100%;aspect-ratio:4/3;background:#ebe3d5 center/contain no-repeat;border-radius:12px}
+.gthumbs{display:flex;gap:6px}
+.gthumbs button{width:64px;height:48px;border-radius:8px;border:2px solid transparent;background:#ebe3d5 center/cover;cursor:pointer;padding:0}
+.gthumbs button.on{border-color:var(--ink)}
+.dl{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;margin:14px 0;font-size:14px}
+.dl dt{color:var(--mute)}
+.dl dd{margin:0}
+.desc{white-space:pre-wrap;margin:10px 0 4px}
+.contact{background:#f6f1e7;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:16px}
+.contact h3{font-size:16px;margin-bottom:8px}
+.crow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.crow code{background:var(--paper);border:1px solid var(--line);padding:6px 10px;border-radius:8px;font-family:inherit;user-select:all;word-break:break-all}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
+.actions select{border:1px solid var(--line);border-radius:999px;padding:7px 12px;background:var(--paper);font-size:13px}
+
+/* form */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+label.f span.h{font-weight:400;color:var(--mute)}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;font-weight:400}
+.f textarea{min-height:110px;resize:vertical}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.seg button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 6px;cursor:pointer;font-weight:600;font-size:13px}
+.seg button.on[data-v=vente]{background:var(--vente);color:#fff;border-color:var(--vente)}
+.seg button.on[data-v=recherche]{background:var(--recherche);color:#fff;border-color:var(--recherche)}
+.seg button.on[data-v=don]{background:var(--don);color:#fff;border-color:var(--don)}
+.seg button.on[data-v=pret]{background:var(--pret);color:#fff;border-color:var(--pret)}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--mute);cursor:pointer;background:#fff}
+.drop.over{border-color:var(--ink);background:#faf6ee}
+.previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.pv{width:86px;height:66px;border-radius:8px;background:#eee center/cover;position:relative}
+.pv button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--ink);color:#fff;cursor:pointer;font-size:13px;line-height:22px;padding:0}
+.section-t{grid-column:1/-1;font-family:Fraunces,serif;font-size:16px;font-weight:700;margin-top:8px;padding-top:12px;border-top:1px solid var(--line)}
+.err{color:var(--danger);font-size:13px;min-height:18px;margin-top:10px}
+.fbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+@media (max-width:600px){.fgrid{grid-template-columns:1fr}.seg{grid-template-columns:1fr 1fr}.dl{grid-template-columns:1fr}.dl dt{margin-top:6px}}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;transition:transform .25s;z-index:40;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.confirm{position:fixed;inset:0;background:rgba(25,20,14,.55);display:none;align-items:center;justify-content:center;z-index:30;padding:20px}
+.confirm.show{display:flex}
+.confirm .box{background:var(--paper);border-radius:16px;padding:20px;max-width:380px;width:100%}
+.confirm p{margin:0 0 16px}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--mute);font-size:13px}
+footer ul{margin:6px 0 0;padding-left:18px}
+.copybox{width:100%;min-height:200px;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:inherit;font-size:13px;background:#fff}
+
+.demo-bar{background:#1f1c18;color:#fff;text-align:center;font-size:13px;padding:7px 12px}
+.mine{font-size:12px;font-weight:600;color:var(--vente)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+a.btn{text-decoration:none}
+.card:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<div class="demo-bar" id="demoBar" hidden>Mode démo : rien n'est enregistré. Renseignez <b>config.js</b> pour brancher la vraie base.</div>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <small>Entre fabricants de lunettes</small>
+        <h1 id="siteName">La Bourse des Ateliers</h1>
+        <p>Machines, outillage, matière et pièces détachées : vendez, donnez, prêtez ou dites ce que vous cherchez. C'est gratuit, sans inscription ni commission, et vous traitez en direct.</p>
+      </div>
+      <button class="btn" id="btnNew">＋ Déposer une annonce</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="banner" id="banner"></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap">
+    <div class="tabs" id="tabs"></div>
+    <div class="filters">
+      <input id="q" type="search" placeholder="Rechercher : tonneau, Biesse, plaques acétate…">
+      <select id="fCat"></select>
+      <select id="fSort">
+        <option value="recent">Plus récentes</option>
+        <option value="prixAsc">Prix croissant</option>
+        <option value="prixDesc">Prix décroissant</option>
+      </select>
+      <label class="chk" id="mineWrap"><input type="checkbox" id="fMine"> Mes annonces</label>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden></div>
+    <div style="text-align:center;margin-top:18px"><label class="chk" style="justify-content:center"><input type="checkbox" id="fClosed"> Afficher aussi les annonces vendues / terminées</label></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <b style="color:var(--ink)">Règles de la bourse</b>
+    <ul>
+      <li>Entre fabricants et ateliers. Aucune commission : vous traitez directement entre vous.</li>
+      <li>À la publication, vous recevez un <b>lien personnel</b> pour modifier, marquer « Vendu » ou supprimer votre annonce. Gardez-le précieusement.</li>
+      <li>Au-delà de 3 mois, une annonce est signalée comme ancienne. « Toujours d'actualité » la remet en tête.</li>
+      <li>Les coordonnées ne s'affichent qu'au clic, pour limiter les robots qui collectent les e-mails.</li>
+    </ul>
+    <p style="margin-top:14px"><a href="#admin" style="color:var(--mute)">Espace modération</a></p>
+  </div>
+</footer>
+
+<!-- détail -->
+<div class="overlay" id="ovDetail"><div class="modal" role="dialog" aria-modal="true">
+  <div class="mhead"><h2 id="dTitle"></h2><button class="x" data-close aria-label="Fermer">×</button></div>
+  <div class="mbody" id="dBody"></div>
+</div></div>
+
+<!-- formulaire -->
+<div class="overlay" id="ovForm"><div class="modal" role="dialog" aria-modal="true">
+  <div class="mhead"><h2 id="fTitle">Déposer une annonce</h2><button class="x" data-close aria-label="Fermer">×</button></div>
+  <form class="mbody" id="form" novalidate>
+    <div class="fgrid">
+      <div class="full">
+        <label class="f">Type d'annonce</label>
+        <div class="seg" id="segType" style="margin-top:5px">
+          <button type="button" data-v="vente">Je vends</button>
+          <button type="button" data-v="recherche">Je cherche</button>
+          <button type="button" data-v="don">Je donne</button>
+          <button type="button" data-v="pret">Prêt / location</button>
+        </div>
+      </div>
+      <label class="f full">Titre *<input name="titre" maxlength="90" placeholder="ex. Tonneau de polissage Rösler 60 L"></label>
+      <label class="f">Catégorie<select name="categorie" id="formCat"></select></label>
+      <label class="f">État<select name="etat">
+        <option value="">—</option><option>Neuf</option><option>Très bon état</option><option>Bon état, fonctionne</option><option>À réviser</option><option>Pour pièces</option>
+      </select></label>
+      <label class="f">Marque / modèle<input name="marque" maxlength="80" placeholder="ex. Biesse Rover, Mazzucchelli…"></label>
+      <label class="f">Année<input name="annee" maxlength="10" inputmode="numeric" placeholder="ex. 2014"></label>
+      <label class="f">Prix<select name="prix_mode" id="prixMode">
+        <option value="prix">Prix fixe</option><option value="debattre">Prix à débattre</option><option value="echange">Échange possible</option><option value="donner">Gratuit</option><option value="budget">Budget max. (recherche)</option>
+      </select></label>
+      <label class="f" id="prixWrap">Montant (€)<input name="prix" inputmode="decimal" placeholder="ex. 1500"></label>
+      <label class="f full">Description<span class="h">Dimensions, puissance, accessoires fournis, raison de la vente, ce que vous cherchez précisément…</span><textarea name="description" maxlength="3000"></textarea></label>
+      <label class="f">Localisation<input name="lieu" maxlength="60" placeholder="ville ou département, ex. Oyonnax (01)"></label>
+      <label class="f">Remise<select name="remise">
+        <option value="">—</option><option>Enlèvement sur place</option><option>Livraison possible</option><option>Envoi possible</option><option>À voir ensemble</option>
+      </select></label>
+      <div class="full">
+        <label class="f">Photos <span class="h">jusqu'à 4. Elles sont réduites automatiquement.</span></label>
+        <div class="drop" id="drop" style="margin-top:5px">📷 Touchez pour prendre ou choisir des photos<br><small>ou glissez-les ici</small></div>
+        <input type="file" id="file" accept="image/*" multiple hidden>
+        <div class="previews" id="previews"></div>
+      </div>
+      <div class="section-t">Vos coordonnées <span class="h" style="font-family:Inter;font-weight:400;font-size:13px;color:var(--mute)">affichées au clic sur l'annonce</span></div>
+      <label class="f">Prénom et nom *<input name="nom" maxlength="60" autocomplete="name"></label>
+      <label class="f">Atelier / entreprise<input name="atelier" maxlength="60" autocomplete="organization"></label>
+      <label class="f">E-mail de contact *<input name="email" type="email" maxlength="100" autocomplete="email"></label>
+      <label class="f">Téléphone <span class="h">facultatif</span><input name="tel" type="tel" maxlength="25" autocomplete="tel"></label>
+      <label class="hp" aria-hidden="true">Ne pas remplir<input name="site_web" tabindex="-1" autocomplete="off"></label>
+    </div>
+    <div class="err" id="fErr"></div>
+    <div class="fbtns">
+      <button type="button" class="btn ghost" data-close>Annuler</button>
+      <button type="submit" class="btn" id="btnSave">Publier l'annonce</button>
+    </div>
+  </form>
+</div></div>
+
+<!-- publication réussie -->
+<div class="overlay" id="ovDone"><div class="modal">
+  <div class="mhead"><h2>Annonce publiée 🎉</h2><button class="x" data-close aria-label="Fermer">×</button></div>
+  <div class="mbody">
+    <p style="margin-top:0"><b>Gardez ce lien</b> : c'est lui qui vous permet de modifier votre annonce, de la passer en « Vendu » ou de la supprimer. Sur cet appareil, c'est automatique.</p>
+    <div class="crow"><code id="doneLink"></code></div>
+    <div class="fbtns" style="justify-content:flex-start;flex-wrap:wrap">
+      <button class="btn" id="btnCopyLink">Copier le lien</button>
+      <a class="btn ghost" id="btnMailLink" href="#">M'envoyer le lien par e-mail</a>
+      <button class="btn ghost" data-close>Voir les annonces</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- admin -->
+<div class="overlay" id="ovAdmin"><div class="modal" style="max-width:420px">
+  <div class="mhead"><h2>Modération</h2><button class="x" data-close aria-label="Fermer">×</button></div>
+  <form class="mbody" id="adminForm">
+    <label class="f">Code administrateur<input type="password" name="code" autocomplete="current-password"></label>
+    <div class="err" id="aErr"></div>
+    <div class="fbtns"><button type="button" class="btn ghost" id="btnAdminOut" hidden>Quitter le mode modération</button><button class="btn" type="submit">Entrer</button></div>
+  </form>
+</div></div>
+
+<div class="confirm" id="confirm"><div class="box"><p id="cMsg"></p><div class="fbtns"><button class="btn ghost" id="cNo">Annuler</button><button class="btn danger" id="cYes">Supprimer</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+"use strict";
+const CFG = window.BOURSE_CONFIG || {};
+const DEMO = !CFG.supabaseUrl || /VOTRE/.test(CFG.supabaseUrl) || !CFG.supabaseAnonKey || /VOTRE/.test(CFG.supabaseAnonKey) || !window.supabase;
+
+const TYPES = {
+  vente:{label:"À vendre", badge:"Vente", cls:"b-vente"},
+  recherche:{label:"Recherché", badge:"Recherche", cls:"b-recherche"},
+  don:{label:"À donner", badge:"Don", cls:"b-don"},
+  pret:{label:"Prêt / location", badge:"Prêt", cls:"b-pret"}
+};
+const CATS = [
+  "Usinage / CNC / fraiseuse","Polissage / tonneau / lustrage","Perçage / charnières / rivetage",
+  "Découpe / gravure / laser","Chauffe / cambrage / thermoformage","Mesure / contrôle / optique",
+  "Outillage & fraises","Matière première (acétate, bois, métal…)","Consommables (pâtes, médias, abrasifs…)",
+  "Pièces détachées","Mobilier & aménagement d'atelier","Informatique / logiciel / CAO","Autre"
+];
+const STATUTS = {dispo:"Disponible", reserve:"Réservé", termine:"Vendu / terminé"};
+const OLD_MS = 90*24*3600*1000;
+const COLS = "id,type,titre,categorie,etat,marque,annee,prix_mode,prix,description,lieu,remise,nom,atelier,photos,statut,created_at,bumped_at";
+
+/* ================= accès aux données ================= */
+function supabaseApi(){
+  const sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {auth:{persistSession:false}});
+  const base = CFG.supabaseUrl.replace(/\/$/,"");
+  const rpc = async (fn, args) => { const {data, error} = await sb.rpc(fn, args); if (error) throw new Error(error.message || "Erreur"); return data; };
+  return {
+    async list(){ const {data, error} = await sb.from("annonces").select(COLS).order("bumped_at",{ascending:false}).limit(1000); if (error) throw new Error(error.message); return data || []; },
+    contact: id => rpc("contact_annonce", {p_id:id}),
+    create: p => rpc("creer_annonce", {p}),
+    update: (id, token, p) => rpc("modifier_annonce", {p_id:id, p_token:token, p}),
+    statut: (id, token, s) => rpc("changer_statut", {p_id:id, p_token:token, p_statut:s}),
+    bump: (id, token) => rpc("remettre_en_tete", {p_id:id, p_token:token}),
+    remove: (id, token) => rpc("supprimer_annonce", {p_id:id, p_token:token}),
+    check: (id, token) => rpc("verifier_acces", {p_id:id, p_token:token}),
+    checkAdmin: code => rpc("verifier_admin", {p_code:code}),
+    async upload(name, full, thumb){
+      for (const [n, b] of [[name+".jpg", full], [name+"-m.jpg", thumb]]) {
+        const {error} = await sb.storage.from("photos").upload(n, b, {contentType:"image/jpeg", upsert:false, cacheControl:"31536000"});
+        if (error) throw new Error("Photo non envoyée : " + error.message);
+      }
+    },
+    photoUrl: (name, small) => `${base}/storage/v1/object/public/photos/${name}${small?"-m":""}.jpg`
+  };
+}
+function demoApi(){
+  const now = Date.now(), iso = t => new Date(t).toISOString();
+  let rows = [
+    {id:"demo-1", type:"vente", titre:"Tonneau de polissage 60 L", categorie:"Polissage / tonneau / lustrage", etat:"Bon état, fonctionne", marque:"Rösler", annee:"2012", prix_mode:"debattre", prix:1500, description:"Exemple d'annonce en mode démo.\nVendu avec 20 kg de copeaux de bois.", lieu:"Landes (40)", remise:"Enlèvement sur place", nom:"Atelier Démo", atelier:"Démo SARL", photos:[], statut:"dispo", created_at:iso(now-3*864e5), bumped_at:iso(now-3*864e5), _email:"demo@exemple.fr", _tel:""},
+    {id:"demo-2", type:"recherche", titre:"Cherche fraises carbure Ø2 pour acétate", categorie:"Outillage & fraises", prix_mode:"budget", prix:200, description:"Exemple de recherche.", lieu:"Jura (39)", nom:"Fabricant Démo", atelier:"", photos:[], statut:"dispo", created_at:iso(now-120*864e5), bumped_at:iso(now-120*864e5), _email:"demo2@exemple.fr", _tel:"06 00 00 00 00"}
+  ];
+  const tokens = {"demo-1":"demo"}, blobs = {};
+  const pub = r => { const {_email, _tel, ...x} = r; return {...x}; };
+  const can = (id, t) => t === "demo-admin" || tokens[id] === t;
+  const guard = (id, t) => { if (!can(id, t)) throw new Error("Lien de modification non valable."); };
+  const clean = p => ({type:p.type, titre:p.titre, categorie:p.categorie, etat:p.etat, marque:p.marque, annee:p.annee, prix_mode:p.prix_mode, prix:p.prix===""?null:parseFloat(String(p.prix).replace(",", ".")), description:p.description, lieu:p.lieu, remise:p.remise, nom:p.nom, atelier:p.atelier, photos:p.photos||[], _email:p.email, _tel:p.tel});
+  const wait = () => new Promise(r => setTimeout(r, 150));
+  return {
+    async list(){ await wait(); return rows.map(pub).sort((a,b)=>Date.parse(b.bumped_at)-Date.parse(a.bumped_at)); },
+    async contact(id){ const r = rows.find(x=>x.id===id); return r ? {email:r._email, tel:r._tel} : null; },
+    async create(p){ await wait(); if (p.site_web) throw new Error("Annonce refusée."); const id = "demo-" + Math.random().toString(36).slice(2,8), t = Math.random().toString(36).slice(2); tokens[id] = t; rows.push({id, statut:"dispo", created_at:iso(Date.now()), bumped_at:iso(Date.now()), ...clean(p)}); return {id, token:t}; },
+    async update(id, t, p){ guard(id, t); Object.assign(rows.find(x=>x.id===id), clean(p)); },
+    async statut(id, t, s){ guard(id, t); rows.find(x=>x.id===id).statut = s; },
+    async bump(id, t){ guard(id, t); const r = rows.find(x=>x.id===id); r.bumped_at = iso(Date.now()); if (r.statut==="termine") r.statut = "dispo"; },
+    async remove(id, t){ guard(id, t); rows = rows.filter(x=>x.id!==id); },
+    async check(id, t){ return can(id, t); },
+    async checkAdmin(c){ return c === "demo-admin"; },
+    async upload(name, full, thumb){ blobs[name] = URL.createObjectURL(full); blobs[name+"-m"] = URL.createObjectURL(thumb); },
+    photoUrl: (name, small) => blobs[name + (small?"-m":"")] || ""
+  };
+}
+const api = DEMO ? demoApi() : supabaseApi();
+
+/* ================= état ================= */
+let ads = [], loaded = false, loadError = false, lastLoad = 0;
+let state = {type:"all", q:"", cat:"", sort:"recent", mine:false, closed:false};
+let editing = null, formType = "vente", formPhotos = [];
+let myTokens = {}, adminCode = "";
+try { myTokens = JSON.parse(localStorage.getItem("bourse-mes-annonces") || "{}") || {}; } catch(e) {}
+try { adminCode = sessionStorage.getItem("bourse-admin") || ""; } catch(e) {}
+const saveTokens = () => { try { localStorage.setItem("bourse-mes-annonces", JSON.stringify(myTokens)); } catch(e) {} };
+const tokenFor = id => myTokens[id] || adminCode || "";
+
+/* ================= utilitaires ================= */
+const $ = s => document.querySelector(s);
+const el = (tag, attrs={}, ...kids) => { const e = document.createElement(tag); for (const [k,v] of Object.entries(attrs)) { if (v==null) continue; if (k==="class") e.className=v; else if (k==="text") e.textContent=v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else if (k==="style") e.style.cssText=v; else e.setAttribute(k, v); } for (const c of kids) { if (c==null || c===false) continue; e.append(c.nodeType ? c : document.createTextNode(c)); } return e; };
+const toast = m => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 3000); };
+const fmtEur = n => new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:Number.isInteger(n)?0:2}).format(n);
+const ts = a => Date.parse(a.bumped_at || a.created_at) || 0;
+const fmtDate = t => new Date(t).toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"});
+function ago(t){ const d = Math.floor((Date.now()-t)/864e5); if (d<1) return "aujourd'hui"; if (d===1) return "hier"; if (d<30) return `il y a ${d} j`; const m = Math.floor(d/30); return m<12 ? `il y a ${m} mois` : `il y a ${Math.floor(m/12)} an${m>=24?"s":""}`; }
+const num = v => { const n = typeof v === "number" ? v : parseFloat(String(v ?? "").replace(",", ".")); return isFinite(n) ? n : null; };
+function priceText(a){
+  const n = num(a.prix);
+  if (a.type==="don" || a.prix_mode==="donner") return "Gratuit";
+  if (a.prix_mode==="budget") return n!=null ? `Budget max. ${fmtEur(n)}` : "Budget à définir";
+  if (a.prix_mode==="echange") return n!=null ? `${fmtEur(n)} ou échange` : "Échange";
+  if (a.prix_mode==="debattre") return n!=null ? `${fmtEur(n)} à débattre` : "Prix à débattre";
+  return n!=null ? fmtEur(n) : (a.type==="recherche" ? "" : "Prix sur demande");
+}
+async function copy(text, msg){ try { await navigator.clipboard.writeText(text); toast(msg || "Copié"); } catch(e) { toast("Copie impossible : sélectionnez le texte à la main"); } }
+const siteUrl = () => location.href.split("#")[0];
+const icon = () => { const d = document.createElement("div"); d.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>'; return d.firstChild; };
+const friendly = e => { const m = (e && e.message) || ""; if (/fetch|network|Failed/i.test(m)) return "Connexion impossible. Vérifiez votre réseau et réessayez."; return m || "Une erreur est survenue."; };
+
+/* ================= chargement ================= */
+async function load(){
+  try { ads = await api.list(); loadError = false; }
+  catch(e) { loadError = true; console.error(e); }
+  loaded = true; lastLoad = Date.now(); render();
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState==="visible" && Date.now()-lastLoad > 60000) load(); });
+
+/* ================= affichage ================= */
+const isMine = a => !!myTokens[a.id];
+const canManage = a => isMine(a) || !!adminCode;
+function filtered(){
+  const q = state.q.trim().toLowerCase();
+  const list = ads.filter(a => {
+    if (!state.closed && a.statut==="termine" && !state.mine) return false;
+    if (state.type!=="all" && a.type!==state.type) return false;
+    if (state.cat && a.categorie!==state.cat) return false;
+    if (state.mine && !isMine(a)) return false;
+    if (q) { const hay = [a.titre,a.description,a.marque,a.categorie,a.lieu,a.atelier,a.nom].join(" ").toLowerCase(); if (!q.split(/\s+/).every(w=>hay.includes(w))) return false; }
+    return true;
+  });
+  const p = a => { const n = num(a.prix); return n!=null ? n : (a.type==="don"||a.prix_mode==="donner" ? 0 : null); };
+  if (state.sort==="recent") list.sort((a,b)=>ts(b)-ts(a));
+  else list.sort((a,b)=>{ const x=p(a), y=p(b); if (x==null) return 1; if (y==null) return -1; return state.sort==="prixAsc" ? x-y : y-x; });
+  return list;
+}
+function render(){
+  const active = ads.filter(a=>a.statut!=="termine");
+  $("#stats").replaceChildren(
+    el("span",{class:"stat"}, el("b",{text:String(active.filter(a=>a.type==="vente").length)}), " à vendre"),
+    el("span",{class:"stat"}, el("b",{text:String(active.filter(a=>a.type==="recherche").length)}), " recherches"),
+    el("span",{class:"stat"}, el("b",{text:String(active.filter(a=>a.type==="don"||a.type==="pret").length)}), " dons et prêts")
+  );
+  $("#mineWrap").style.display = Object.keys(myTokens).length ? "" : "none";
+  const b = $("#banner");
+  if (adminCode) { b.textContent = "Mode modération actif : vous pouvez modifier ou supprimer toutes les annonces."; b.classList.add("show"); }
+  else b.classList.remove("show");
+
+  const grid = $("#grid"), empty = $("#empty"); grid.replaceChildren();
+  if (!loaded) { empty.hidden = false; empty.replaceChildren(el("p",{text:"Chargement des annonces…"})); return; }
+  if (loadError && !ads.length) { empty.hidden = false; empty.replaceChildren(el("h2",{text:"Les annonces n'ont pas pu être chargées"}), el("p",{text:"Vérifiez votre connexion internet."}), el("button",{class:"btn",style:"margin-top:10px",text:"Réessayer",onclick:()=>{loaded=false;render();load();}})); return; }
+  const list = filtered();
+  if (!list.length) {
+    empty.hidden = false;
+    empty.replaceChildren(
+      el("h2",{text: ads.length ? "Aucune annonce ne correspond" : "La bourse est encore vide"}),
+      el("p",{text: ads.length ? "Essayez d'autres mots-clés ou retirez un filtre." : "Soyez le premier atelier à proposer une machine ou à dire ce que vous cherchez."}),
+      ads.length ? null : el("button",{class:"btn",style:"margin-top:10px",text:"＋ Déposer une annonce",onclick:()=>openForm(null)})
+    ); return;
+  }
+  empty.hidden = true;
+  for (const a of list) {
+    const t = TYPES[a.type] || TYPES.vente;
+    const th = el("div",{class:"thumb"});
+    if (a.photos && a.photos[0]) { const u = api.photoUrl(a.photos[0], true); if (u) th.style.backgroundImage = `url("${u}")`; else th.append(icon()); } else th.append(icon());
+    th.append(el("span",{class:"badge "+t.cls, text:t.badge}));
+    if (a.statut && a.statut!=="dispo") th.append(el("span",{class:"badge statut", text:STATUTS[a.statut]}));
+    const pt = priceText(a);
+    const old = Date.now()-ts(a) > OLD_MS && a.statut!=="termine";
+    grid.append(el("article",{class:"card"+(a.statut==="termine"?" closed":""), tabindex:"0", onclick:()=>{location.hash="annonce/"+a.id;}, onkeydown:e=>{if(e.key==="Enter")location.hash="annonce/"+a.id;}},
+      th,
+      el("div",{class:"cbody"},
+        el("h3",{text:a.titre || "Sans titre"}),
+        pt ? el("div",{class:"price",text:pt}) : null,
+        el("div",{class:"meta"}, el("span",{text:a.categorie || "Autre"}), a.lieu ? el("span",{text:a.lieu}) : null),
+        el("div",{class:"meta"}, el("span",{text:a.atelier || a.nom || ""}), el("span",{text:ago(ts(a))})),
+        old ? el("div",{class:"old",text:"Annonce de plus de 3 mois"}) : null,
+        isMine(a) ? el("div",{class:"mine",text:"Mon annonce"}) : null
+      )));
+  }
+}
+
+/* ================= navigation ================= */
+function showOv(id){ document.querySelectorAll(".overlay.show").forEach(o=>o.classList.remove("show")); $(id).classList.add("show"); document.body.style.overflow="hidden"; $(id).scrollTop=0; }
+function closeAll(){
+  document.querySelectorAll(".overlay.show").forEach(o=>o.classList.remove("show"));
+  document.body.style.overflow = "";
+  if (location.hash && location.hash !== "#") history.replaceState(null, "", location.pathname + location.search);
+}
+async function route(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (!h) { document.querySelectorAll(".overlay.show").forEach(o=>o.classList.remove("show")); document.body.style.overflow = ""; return; }
+  if (h === "admin") { openAdmin(); return; }
+  const parts = h.split("/");
+  if (parts[0]==="gerer" && parts[1] && parts[2]) {
+    const [, id, token] = parts;
+    try {
+      if (await api.check(id, token)) { myTokens[id] = token; saveTokens(); toast("Vous pouvez gérer cette annonce depuis cet appareil"); history.replaceState(null,"","#annonce/"+id); }
+      else { toast("Ce lien de modification n'est plus valable"); history.replaceState(null,"","#annonce/"+id); }
+    } catch(e) { toast(friendly(e)); }
+    render(); return route();
+  }
+  if (parts[0]==="annonce" && parts[1]) {
+    if (!loaded) return;
+    const a = ads.find(x=>x.id===parts[1]);
+    if (a) openDetail(a); else { toast("Cette annonce n'existe plus"); closeAll(); }
+  }
+}
+window.addEventListener("hashchange", route);
+
+/* ================= fiche annonce ================= */
+function openDetail(a){
+  const t = TYPES[a.type] || TYPES.vente;
+  $("#dTitle").textContent = a.titre;
+  const body = $("#dBody"); body.replaceChildren();
+  const photos = (a.photos||[]).map(p=>api.photoUrl(p,false)).filter(Boolean);
+  if (photos.length) {
+    const gmain = el("div",{class:"gmain"}); gmain.style.backgroundImage = `url("${photos[0]}")`;
+    const gth = el("div",{class:"gthumbs"});
+    if (photos.length>1) photos.forEach((src,i)=>{ const b = el("button",{class:i?"":"on","aria-label":"Photo "+(i+1)}); b.style.backgroundImage=`url("${src}")`; b.addEventListener("click",()=>{ gmain.style.backgroundImage=`url("${src}")`; gth.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); }); gth.append(b); });
+    body.append(el("div",{class:"gallery"}, gmain, gth));
+  }
+  body.append(el("div",{style:"display:flex;gap:8px;align-items:center;flex-wrap:wrap"},
+    el("span",{class:"badge "+t.cls, text:t.label}),
+    el("span",{class:"badge", style:"background:#ece4d6", text:STATUTS[a.statut]||"Disponible"}),
+    el("span",{class:"price", style:"margin-left:auto", text:priceText(a)})));
+  const dl = el("dl",{class:"dl"});
+  const row = (k,v) => { if (v) dl.append(el("dt",{text:k}), el("dd",{text:String(v)})); };
+  row("Catégorie",a.categorie); row("Marque / modèle",a.marque); row("Année",a.annee); row("État",a.etat); row("Localisation",a.lieu); row("Remise",a.remise);
+  const c0 = Date.parse(a.created_at), b0 = Date.parse(a.bumped_at);
+  row("Publiée le", fmtDate(c0) + (b0 - c0 > 864e5 ? ` (remise en tête le ${fmtDate(b0)})` : ""));
+  body.append(dl);
+  if (a.description) body.append(el("div",{class:"desc",text:a.description}));
+
+  const c = el("div",{class:"contact"}, el("h3",{text:"Contacter " + (a.nom || "l'annonceur")}));
+  if (a.atelier) c.append(el("div",{class:"meta",text:a.atelier}));
+  const reveal = el("button",{class:"btn small", style:"margin-top:8px", text:"Afficher les coordonnées"});
+  reveal.addEventListener("click", async () => {
+    reveal.disabled = true; reveal.textContent = "…";
+    try {
+      const k = await api.contact(a.id); reveal.remove();
+      const subject = encodeURIComponent("Bourse des Ateliers : " + a.titre);
+      if (k && k.email) c.append(el("div",{class:"crow"}, el("code",{text:k.email}),
+        el("button",{class:"btn small ghost",text:"Copier",onclick:()=>copy(k.email,"Adresse copiée")}),
+        el("a",{class:"btn small",href:`mailto:${k.email}?subject=${subject}`,text:"Écrire un e-mail"})));
+      if (k && k.tel) c.append(el("div",{class:"crow"}, el("code",{text:k.tel}),
+        el("button",{class:"btn small ghost",text:"Copier",onclick:()=>copy(k.tel,"Numéro copié")}),
+        el("a",{class:"btn small ghost",href:"tel:"+k.tel.replace(/[^\d+]/g,""),text:"Appeler"})));
+    } catch(e) { reveal.disabled = false; reveal.textContent = "Afficher les coordonnées"; toast(friendly(e)); }
+  });
+  c.append(reveal);
+  body.append(c);
+
+  const acts = el("div",{class:"actions"});
+  acts.append(el("button",{class:"btn small ghost",text:"🔗 Copier le lien de l'annonce",onclick:()=>copy(siteUrl()+"#annonce/"+a.id,"Lien copié : collez-le dans WhatsApp ou un e-mail")}));
+  if (CFG.emailModeration && !canManage(a)) acts.append(el("a",{class:"btn small ghost",href:`mailto:${CFG.emailModeration}?subject=${encodeURIComponent("Signalement : "+a.titre)}&body=${encodeURIComponent(siteUrl()+"#annonce/"+a.id)}`,text:"Signaler"}));
+  if (canManage(a)) {
+    const tok = tokenFor(a.id);
+    const sel = el("select",{"aria-label":"Statut"});
+    Object.entries(STATUTS).forEach(([v,l])=>{ const o = el("option",{value:v,text:l}); if ((a.statut||"dispo")===v) o.selected = true; sel.append(o); });
+    sel.addEventListener("change", () => act(() => api.statut(a.id, tok, sel.value), "Statut mis à jour", a.id));
+    acts.append(sel,
+      el("button",{class:"btn small ghost",text:"Toujours d'actualité",onclick:()=>act(()=>api.bump(a.id,tok),"Annonce remise en tête",a.id)}),
+      el("button",{class:"btn small ghost",text:"Modifier",onclick:()=>openForm(a)}),
+      el("button",{class:"btn small danger",text:"Supprimer",onclick:()=>askDelete(a)}));
+    if (isMine(a)) acts.append(el("button",{class:"btn small ghost",text:"Copier mon lien de modification",onclick:()=>copy(siteUrl()+"#gerer/"+a.id+"/"+myTokens[a.id],"Lien de modification copié")}));
+  }
+  body.append(acts);
+  showOv("#ovDetail");
+}
+async function act(fn, msg, id){
+  try { await fn(); toast(msg); await load(); const a = ads.find(x=>x.id===id); if (a) openDetail(a); else closeAll(); }
+  catch(e) { toast(friendly(e)); }
+}
+function askDelete(a){
+  $("#cMsg").textContent = `Supprimer définitivement « ${a.titre} » ?`;
+  const c = $("#confirm"); c.classList.add("show");
+  $("#cNo").onclick = () => c.classList.remove("show");
+  $("#cYes").onclick = async () => {
+    c.classList.remove("show");
+    try { await api.remove(a.id, tokenFor(a.id)); delete myTokens[a.id]; saveTokens(); closeAll(); toast("Annonce supprimée"); load(); }
+    catch(e) { toast(friendly(e)); }
+  };
+}
+
+/* ================= formulaire ================= */
+function setFormType(v){
+  formType = v;
+  document.querySelectorAll("#segType button").forEach(b=>b.classList.toggle("on", b.dataset.v===v));
+  const pm = $("#prixMode");
+  if (v==="don") pm.value = "donner";
+  else if (v==="recherche" && (pm.value==="prix"||pm.value==="donner")) pm.value = "budget";
+  else if (v!=="recherche" && pm.value==="budget") pm.value = "prix";
+  else if (v!=="don" && pm.value==="donner") pm.value = "prix";
+  $("#btnSave").textContent = editing ? "Enregistrer" : (v==="recherche" ? "Publier ma recherche" : "Publier l'annonce");
+  syncPrix();
+}
+function syncPrix(){ $("#prixWrap").style.display = $("#prixMode").value==="donner" ? "none" : ""; }
+function openForm(a){
+  editing = a; formPhotos = [];
+  const f = $("#form"); f.reset(); $("#fErr").textContent = "";
+  $("#fTitle").textContent = a ? "Modifier l'annonce" : "Déposer une annonce";
+  if (a) {
+    for (const k of ["titre","categorie","etat","marque","annee","prix","description","lieu","remise","nom","atelier"]) if (f.elements[k]) f.elements[k].value = a[k] ?? "";
+    setFormType(a.type || "vente");
+    $("#prixMode").value = a.prix_mode || "prix"; syncPrix();
+    formPhotos = (a.photos||[]).map(name => ({name, preview: api.photoUrl(name, true)}));
+    api.contact(a.id).then(k => { if (k) { if (!f.elements.email.value) f.elements.email.value = k.email || ""; if (!f.elements.tel.value) f.elements.tel.value = k.tel || ""; } }).catch(()=>{});
+  } else {
+    let saved = {}; try { saved = JSON.parse(localStorage.getItem("bourse-contact") || "{}") || {}; } catch(e) {}
+    for (const k of ["nom","atelier","email","tel"]) if (saved[k]) f.elements[k].value = saved[k];
+    setFormType("vente");
+  }
+  renderPreviews(); showOv("#ovForm");
+}
+function renderPreviews(){
+  const p = $("#previews"); p.replaceChildren();
+  formPhotos.forEach((ph, i) => { const d = el("div",{class:"pv"}); d.style.backgroundImage = `url("${ph.preview}")`; d.append(el("button",{type:"button","aria-label":"Retirer la photo",text:"×",onclick:()=>{ formPhotos.splice(i,1); renderPreviews(); }})); p.append(d); });
+  $("#drop").style.display = formPhotos.length >= 4 ? "none" : "";
+}
+function loadImage(file){ return new Promise((res, rej) => { const u = URL.createObjectURL(file); const im = new Image(); im.onload = () => res(im); im.onerror = () => { URL.revokeObjectURL(u); rej(new Error("image")); }; im.src = u; }); }
+const toBlob = (c, q) => new Promise(r => c.toBlob(r, "image/jpeg", q));
+async function shrink(im, max, maxBytes){
+  let w = im.naturalWidth, h = im.naturalHeight; const r = Math.min(1, max/Math.max(w,h)); w = Math.round(w*r); h = Math.round(h*r);
+  const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0,0,w,h); x.drawImage(im,0,0,w,h);
+  let q = .8, b = await toBlob(c, q);
+  while (b && b.size > maxBytes && q > .4) { q -= .1; b = await toBlob(c, q); }
+  if (b && b.size > maxBytes && max > 400) return shrink(im, max*.75, maxBytes);
+  return b;
+}
+async function addFiles(files){
+  const list = [...files].filter(f => f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name));
+  if (!list.length) { toast("Choisissez une image (JPG, PNG…)"); return; }
+  for (const f of list) {
+    if (formPhotos.length >= 4) { toast("4 photos maximum"); break; }
+    try {
+      const im = await loadImage(f);
+      const full = await shrink(im, 1600, 450000), thumb = await shrink(im, 480, 60000);
+      URL.revokeObjectURL(im.src);
+      if (!full || !thumb) throw new Error("blob");
+      formPhotos.push({full, thumb, preview: URL.createObjectURL(thumb)}); renderPreviews();
+    } catch(e) { toast("Cette photo n'a pas pu être lue. Essayez en JPG."); }
+  }
+}
+const newName = () => (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,12))).toLowerCase();
+function formData(){
+  const f = $("#form").elements, v = k => (f[k]?.value || "").trim();
+  return {type:formType, titre:v("titre"), categorie:v("categorie"), etat:v("etat"), marque:v("marque"), annee:v("annee"), prix_mode:v("prix_mode"), prix:v("prix"), description:v("description"), lieu:v("lieu"), remise:v("remise"), nom:v("nom"), atelier:v("atelier"), email:v("email"), tel:v("tel"), site_web:v("site_web")};
+}
+async function onSubmit(e){
+  e.preventDefault();
+  const d = formData(), err = $("#fErr"); err.textContent = "";
+  if (d.titre.length < 3) return err.textContent = "Ajoutez un titre (3 caractères minimum).";
+  if (!d.nom) return err.textContent = "Indiquez votre prénom et nom.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) return err.textContent = "L'adresse e-mail ne semble pas valide.";
+  if (d.prix && num(d.prix.replace(/\s/g,"")) == null) return err.textContent = "Le montant doit être un nombre, par ex. 1500.";
+  d.prix = d.prix.replace(/\s/g,"");
+  if (d.prix_mode === "donner") d.prix = "";
+  try { localStorage.setItem("bourse-contact", JSON.stringify({nom:d.nom, atelier:d.atelier, email:d.email, tel:d.tel})); } catch(x) {}
+  const btn = $("#btnSave"); btn.disabled = true;
+  try {
+    const names = [];
+    for (let i = 0; i < formPhotos.length; i++) {
+      const ph = formPhotos[i];
+      if (ph.name) { names.push(ph.name); continue; }
+      btn.textContent = `Envoi des photos ${i+1}/${formPhotos.length}…`;
+      const n = newName(); await api.upload(n, ph.full, ph.thumb); ph.name = n; names.push(n);
+    }
+    btn.textContent = "Publication…";
+    d.photos = names;
+    if (editing) {
+      await api.update(editing.id, tokenFor(editing.id), d);
+      closeAll(); toast("Annonce mise à jour"); await load();
+    } else {
+      const r = await api.create(d);
+      myTokens[r.id] = r.token; saveTokens();
+      await load();
+      const link = siteUrl() + "#gerer/" + r.id + "/" + r.token;
+      $("#doneLink").textContent = link;
+      $("#btnCopyLink").onclick = () => copy(link, "Lien copié");
+      $("#btnMailLink").href = `mailto:${d.email}?subject=${encodeURIComponent("Mon annonce sur la Bourse des Ateliers : "+d.titre)}&body=${encodeURIComponent("Lien pour modifier, marquer vendue ou supprimer mon annonce :\n"+link)}`;
+      showOv("#ovDone");
+    }
+  } catch(x) { err.textContent = friendly(x); }
+  finally { btn.disabled = false; setFormType(formType); }
+}
+
+/* ================= modération ================= */
+function openAdmin(){
+  $("#aErr").textContent = ""; $("#adminForm").reset();
+  $("#btnAdminOut").hidden = !adminCode;
+  showOv("#ovAdmin");
+}
+async function onAdmin(e){
+  e.preventDefault();
+  const code = $("#adminForm").elements.code.value.trim();
+  try {
+    if (await api.checkAdmin(code)) { adminCode = code; try { sessionStorage.setItem("bourse-admin", code); } catch(x) {} closeAll(); render(); toast("Mode modération activé"); }
+    else $("#aErr").textContent = "Code incorrect.";
+  } catch(x) { $("#aErr").textContent = friendly(x); }
+}
+
+/* ================= démarrage ================= */
+function init(){
+  if (CFG.nomSite) { $("#siteName").textContent = CFG.nomSite; document.title = CFG.nomSite; }
+  if (DEMO) $("#demoBar").hidden = false;
+  const tabs = $("#tabs");
+  [["all","Toutes"],["vente","À vendre"],["recherche","Recherchées"],["don","À donner"],["pret","Prêt / location"]].forEach(([v,l]) => {
+    tabs.append(el("button",{class:"tab"+(v==="all"?" on":""), "data-v":v, text:l, onclick:()=>{ state.type=v; tabs.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on", b.dataset.v===v)); render(); }}));
+  });
+  const fc = $("#fCat"); fc.append(el("option",{value:"",text:"Toutes catégories"})); CATS.forEach(c=>fc.append(el("option",{value:c,text:c})));
+  const fm = $("#formCat"); CATS.forEach(c=>fm.append(el("option",{value:c,text:c})));
+  $("#q").addEventListener("input", e=>{ state.q = e.target.value; render(); });
+  fc.addEventListener("change", e=>{ state.cat = e.target.value; render(); });
+  $("#fSort").addEventListener("change", e=>{ state.sort = e.target.value; render(); });
+  $("#fMine").addEventListener("change", e=>{ state.mine = e.target.checked; render(); });
+  $("#fClosed").addEventListener("change", e=>{ state.closed = e.target.checked; render(); });
+  document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click", closeAll));
+  document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click", e=>{ if (e.target===o) closeAll(); }));
+  document.addEventListener("keydown", e=>{ if (e.key==="Escape") closeAll(); });
+  $("#btnNew").addEventListener("click", ()=>openForm(null));
+  $("#segType").addEventListener("click", e=>{ const b = e.target.closest("button"); if (b) setFormType(b.dataset.v); });
+  $("#prixMode").addEventListener("change", syncPrix);
+  const drop = $("#drop"), file = $("#file");
+  drop.addEventListener("click", ()=>file.click());
+  file.addEventListener("change", ()=>{ addFiles(file.files); file.value = ""; });
+  ["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", e=>addFiles(e.dataTransfer.files));
+  $("#form").addEventListener("submit", onSubmit);
+  $("#adminForm").addEventListener("submit", onAdmin);
+  $("#btnAdminOut").addEventListener("click", ()=>{ adminCode = ""; try { sessionStorage.removeItem("bourse-admin"); } catch(x) {} closeAll(); render(); toast("Mode modération désactivé"); });
+  render();
+  load().then(route);
+}
+init();
+</script>
+</body>
+</html>
